@@ -19,6 +19,9 @@
 
 (defpackage :stumpwm
   (:use :cl)
+  (:import-from #:stumpwm/module-system
+                #:stumpwm-module
+                #:stumpwm-module-p)
   (:shadow #:yes-or-no-p #:y-or-n-p))
 
 (defpackage :stumpwm-user
