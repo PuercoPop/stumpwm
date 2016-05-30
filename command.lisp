@@ -47,12 +47,13 @@
 (defvar *max-command-alias-depth* 10
   "")
 
-(define-condition command-docstring-warning (warning)
+(define-condition command-docstring-missing (warning)
   ;; Don't define an accessor to prevent collision with the generic command
   ((command :initarg :command))
   (:report
    (lambda (condition stream)
-     (format stream "The command ~A doesn't have a docstring" (slot-value condition 'command)))))
+     (format stream "The command ~A doesn't have a docstring" (slot-value condition 'command))))
+  (:documentation "A warning to signal that the command does not have a docstring."))
 
 (defmacro defcommand (name (&rest args) (&rest interactive-args) &body body)
   "Create a command function and store its interactive hints in
@@ -120,32 +121,32 @@ when missing.
 Alternatively, instead of specifying nil for PROMPT or leaving it
 out, an element can just be the argument type."
   (check-type name (or symbol list))
-  (let ((docstring (if (stringp (first body))
-                     (first body)
-                     (warn (make-condition 'command-docstring-warning :command name))))
-        (body (if (stringp (first body))
-                  (cdr body) body))
-        (name (if (atom name)
-                  name
-                  (first name)))
-        (group (if (atom name)
-                   t
-                   (second name))))
-  `(progn
-     (defun ,name ,args
-       ,docstring
-       (let ((%interactivep% *interactivep*)
-             (*interactivep* nil))
-         (declare (ignorable %interactivep%))
-         (run-hook-with-args *pre-command-hook* ',name)
-         (multiple-value-prog1
-             (progn ,@body)
-           (run-hook-with-args *post-command-hook* ',name))))
-     (export ',name)
-     (setf (gethash ',name *command-hash*)
-           (make-command :name ',name
-                         :class ',group
-                         :args ',interactive-args)))))
+  (multiple-value-bind (body declarations docstring) (alexandria:parse-body body :documentation t)
+    (let ((name (if (atom name)
+                    name
+                    (first name)))
+          (group (if (atom name)
+                     t
+                     (second name))))
+      (unless docstring
+        (warn (make-condition 'command-docstring-missing :command name)))
+      `(progn
+         (defun ,name ,args
+           ,declarations
+           ,@(when docstring
+              (list docstring))
+           (let ((%interactivep% *interactivep*)
+                 (*interactivep* nil))
+             (declare (ignorable %interactivep%))
+             (run-hook-with-args *pre-command-hook* ',name)
+             (multiple-value-prog1
+                 (progn ,@body)
+               (run-hook-with-args *post-command-hook* ',name))))
+         (export ',name)
+         (setf (gethash ',name *command-hash*)
+               (make-command :name ',name
+                             :class ',group
+                             :args ',interactive-args))))))
 
 (defmacro define-stumpwm-command (name (&rest args) &body body)
   "Deprecated. use `defcommand' instead."
