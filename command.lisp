@@ -121,7 +121,7 @@ when missing.
 Alternatively, instead of specifying nil for PROMPT or leaving it
 out, an element can just be the argument type."
   (check-type name (or symbol list))
-  (multiple-value-bind (body declarations docstring) (alexandria:parse-body body :documentation t)
+  (multiple-value-bind (body declarations docstring) (parse-body body :documentation t)
     (let ((name (if (atom name)
                     name
                     (first name)))
