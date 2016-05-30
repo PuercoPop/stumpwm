@@ -1,8 +1,4 @@
-;;; -*- Mode: Lisp -*-
-
-(defpackage :stumpwm-system
-  (:use :cl :asdf))
-(in-package :stumpwm-system)
+(in-package #:asdf-user)
 
 ;; This is a hack for debian because it calls cmucl's clx
 ;; cmucl-clx. *very* annoying. I don't actually know if debian still
@@ -16,12 +12,12 @@
   :author "Shawn Betts <sabetts@vcn.bc.ca>"
   :version "0.9.9"
   :maintainer "David Bjergaard <dbjergaard@gmail.com>"
-  ;; :license "GNU General Public License"
+  :license "GNU General Public License"
   :description "A tiling, keyboard driven window manager" 
   :serial t
   :depends-on (#:cl-ppcre
-               #-cmu #:clx
-               #+sbcl #:sb-posix
+               (:feature (:not :cmu) #:clx)
+               (:feature :sbcl #:sb-posix)
                #:split-sequence)
   :components ((:file "package")
                (:file "primitives")
