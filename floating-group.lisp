@@ -290,7 +290,7 @@
 (defvar *float-group-root-map* (make-sparse-keymap))
 
 
-(in-package :stumpwm)
+(in-package #:stumpwm)
 (defcommand gnew-float (name) ((:rest "Group Name: "))
   "Create a floating window group with the specified name and switch to it."
   (add-group (current-screen) name :type 'stumpwm.floating-group:float-group))

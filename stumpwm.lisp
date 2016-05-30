@@ -20,7 +20,7 @@
 ;;
 ;; Code:
 
-(in-package :stumpwm)
+(in-package #:stumpwm)
 
 (export '(cancel-timer
 	  run-with-timer

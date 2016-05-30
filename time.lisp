@@ -34,7 +34,7 @@
 
 ;; Code:
 
-(in-package :stumpwm)
+(in-package #:stumpwm)
 
 (export '(*time-format-string-default*
 	  *time-modeline-string*

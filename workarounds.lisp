@@ -1,6 +1,6 @@
 ;;; workarounds for bugs in clx
 
-(in-package :xlib)
+(in-package #:xlib)
 
 ;;; CLISP can't handle non-compliant (and even compliant) wm-class strings. See
 ;;; test-wm-class in test-wm.lisp.

@@ -16,7 +16,7 @@
 ;; along with this software; see the file COPYING.  If not, see
 ;; <http://www.gnu.org/licenses/>.
 
-(in-package :stumpwm)
+(in-package #:stumpwm)
 
 (export '(*mode-line-background-color*
           *mode-line-border-color*

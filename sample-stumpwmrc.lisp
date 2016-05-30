@@ -2,7 +2,7 @@
 ;;
 ;; Here is a sample .stumpwmrc file
 
-(in-package :stumpwm)
+(in-package #:stumpwm)
 
 ;; change the prefix key to something else
 (set-prefix-key (kbd "C-z"))

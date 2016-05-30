@@ -23,7 +23,7 @@
 ;;
 ;; Code:
 
-(in-package :stumpwm)
+(in-package #:stumpwm)
 
 (export '(grab-pointer ungrab-pointer))
 

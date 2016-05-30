@@ -17,11 +17,11 @@
 ;; along with this software; see the file COPYING.  If not, see
 ;; <http://www.gnu.org/licenses/>.
 
-(defpackage :stumpwm
-  (:use :cl)
+(defpackage #:stumpwm
+  (:use #:cl)
   (:import-from #:split-sequence
                 #:split-sequence)
   (:shadow #:yes-or-no-p #:y-or-n-p))
 
-(defpackage :stumpwm-user
-  (:use :cl :stumpwm))
+(defpackage #:stumpwm-user
+  (:use #:cl #:stumpwm))

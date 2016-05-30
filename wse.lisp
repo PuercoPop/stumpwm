@@ -21,7 +21,7 @@
 
 ;; Window Selection Expressions
 
-(in-package :stumpwm)
+(in-package #:stumpwm)
 
 (export '(move-windows-to-group act-on-matching-windows))
 

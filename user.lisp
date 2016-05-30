@@ -22,7 +22,7 @@
 ;;
 ;; Code:
 
-(in-package :stumpwm)
+(in-package #:stumpwm)
 
 (export '(defprogram-shortcut
           pathname-is-executable-p

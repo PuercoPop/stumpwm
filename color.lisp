@@ -53,7 +53,7 @@
 ;;    - :> takes no arguments. It triggers right-alignment for the rest of the
 ;;      line.
 
-(in-package :stumpwm)
+(in-package #:stumpwm)
 
 (export '(*colors*
           update-color-map

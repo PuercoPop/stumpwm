@@ -23,7 +23,7 @@
 ;;
 ;; Code:
 
-(in-package :stumpwm)
+(in-package #:stumpwm)
 
 #+ecl (require "clx")
 

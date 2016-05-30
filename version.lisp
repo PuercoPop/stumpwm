@@ -22,7 +22,7 @@
 ;;
 ;; Code:
 
-(in-package :stumpwm)
+(in-package #:stumpwm)
 
 (export '(*version* version))
 

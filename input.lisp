@@ -21,7 +21,7 @@
 ;; This file handles input stuff
 ;;
 ;; Code:
-(in-package :stumpwm)
+(in-package #:stumpwm)
 
 (export '(*input-history-ignore-duplicates*
           *input-map*
