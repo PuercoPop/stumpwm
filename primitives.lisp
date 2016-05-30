@@ -164,6 +164,7 @@
           modifiers-meta
           modifiers-hyper
           modifiers-numlock
+
           ;; Conditions
           stumpwm-condition
           stumpwm-error
@@ -768,33 +769,6 @@ Useful for re-using the &REST arg after removing some options."
           ;; it out a little.
           default-value))))
 
-(defun split-string (string &optional (separators "
-"))
-  "Splits STRING into substrings where there are matches for SEPARATORS.
-Each match for SEPARATORS is a splitting point.
-The substrings between the splitting points are made into a list
-which is returned.
-***If SEPARATORS is absent, it defaults to \"[ \f\t\n\r\v]+\".
-
-If there is match for SEPARATORS at the beginning of STRING, we do not
-include a null substring for that.  Likewise, if there is a match
-at the end of STRING, we don't include a null substring for that.
-
-Modifies the match data; use `save-match-data' if necessary."
-  (split-seq string separators :test #'char= :default-value '("")))
-
-(defun match-all-regexps (regexps target-string &key (case-insensitive t))
-  "Return T if TARGET-STRING matches all regexps in REGEXPS.
-REGEXPS can be a list of strings (one regexp per element) or a single
-string which is split to obtain the individual regexps. "
-  (let* ((regexps (if (listp regexps)
-                      regexps
-                      (split-string regexps " "))))
-    (loop for pattern in regexps
-       always (let ((scanner (ppcre:create-scanner pattern
-                                                   :case-insensitive-mode case-insensitive)))
-                (ppcre:scan scanner target-string)))))
-
 (defun insert-before (list item nth)
   "Insert ITEM before the NTH element of LIST."
   (declare (type (integer 0 *) nth))
@@ -1253,17 +1227,17 @@ of :error."
     (push ,elt ,list)))
 
 (define-condition stumpwm-condition (condition)
-  ((message :initarg :message :reader warning-message))
-  (:documentation "Any stumpmwm specific condition should inherit from this.")
-  (:report (lambda (condition stream)
-            (format stream "~A~%" (warning-message condition)))))
+  ()
+  (:documentation "Any stumpmwm specific condition should inherit from this."))
 
 (define-condition stumpwm-error (stumpwm-condition error)
   ()
   (:documentation "Any stumpwm specific error should inherit this."))
 
 (define-condition stumpwm-warning (warning stumpwm-condition)
-  ()
+  ((message :initarg :message :reader warning-message))
+  (:report (lambda (condition stream)
+            (format stream "~A~%" (warning-message condition))))
   (:documentation "Adds a message slot to warning. Any stumpwm specific warning
   should inherit from this."))
 
