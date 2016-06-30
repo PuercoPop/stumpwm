@@ -39,8 +39,8 @@
                ,@body))
       (setf (gethash ,event *event-fn-table*) #',fn-name))))
 
-                                        ;(define-stump-event-handler :map-notify (event-window window override-redirect-p)
-                                        ;  )
+;; (define-stump-event-handler :map-notify (event-window window override-redirect-p)
+;;  )
 
 (defun handle-mode-line-window (xwin x y width height)
   (declare (ignore width))
