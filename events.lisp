@@ -34,10 +34,14 @@
 (defmacro define-stump-event-handler (event keys &body body)
   (let ((fn-name (gensym))
         (event-slots (gensym)))
-    `(labels ((,fn-name (&rest ,event-slots &key ,@keys &allow-other-keys)
-               (declare (ignore ,event-slots))
-               ,@body))
-      (setf (gethash ,event *event-fn-table*) #',fn-name))))
+    (multiple-value-bind (body declarations doc-string) (parse-body body :documentation t)
+      `(labels ((,fn-name (&rest ,event-slots &key ,@keys &allow-other-keys)
+                  (declare (ignore ,event-slots))
+                  ,@declarations
+                  ,@(when doc-string
+                      (list doc-string))
+                  ,@body))
+         (setf (gethash ,event *event-fn-table*) #',fn-name)))))
 
 ;; (define-stump-event-handler :map-notify (event-window window override-redirect-p)
 ;;  )
