@@ -13,7 +13,8 @@
                #:clx
                (:feature :sbcl #:sb-posix)
                #:split-sequence)
-  :components ((:file "package")
+  :components ((:file "timer")
+               (:file "package" :depends-on ("timer"))
                (:file "primitives")
                (:file "workarounds")
                (:file "wrappers")
@@ -39,7 +40,11 @@
                (:file "message-window")
                (:file "selection")
                (:file "module")
-               (:file "stumpwm")
+               (:module "io-loop"
+                :components ((:file "protocol")
+                             (:file "sbcl" :if-feature :sbcl)
+                             (:file "fallback" :if-feature (:not :sbcl))))
+               (:file "stumpwm" :depends-on ("timer"))
                (:file "user")
                (:file "iresize")
                (:file "help")

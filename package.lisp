@@ -18,7 +18,8 @@
 ;; <http://www.gnu.org/licenses/>.
 
 (defpackage #:stumpwm
-  (:use #:cl)
+  (:use #:cl
+        #:stumpwm-timer)
   (:import-from #:alexandria
                 #:if-let
                 #:parse-body)
