@@ -132,7 +132,7 @@ out, an element can just be the argument type."
         (warn (make-condition 'command-docstring-missing :command name)))
       `(progn
          (defun ,name ,args
-           ,declarations
+           ,@declarations
            ,@(when docstring
               (list docstring))
            (let ((%interactivep% *interactivep*)
