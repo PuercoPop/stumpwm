@@ -22,6 +22,7 @@
         #:stumpwm-timer)
   (:import-from #:alexandria
                 #:if-let
+                #:when-let
                 #:parse-body)
   (:import-from #:split-sequence
                 #:split-sequence)
