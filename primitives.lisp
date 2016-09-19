@@ -769,6 +769,18 @@ Useful for re-using the &REST arg after removing some options."
           ;; it out a little.
           default-value))))
 
+(defun match-all-regexps (regexps target-string &key (case-insensitive t))
+  "Return T if TARGET-STRING matches all regexps in REGEXPS.
+REGEXPS can be a list of strings (one regexp per element) or a single
+string which is split to obtain the individual regexps. "
+  (let* ((regexps (if (listp regexps)
+                      regexps
+                      (split-sequence regexps " "))))
+    (loop :for pattern :in regexps
+       :always (let ((scanner (ppcre:create-scanner pattern
+                                                   :case-insensitive-mode case-insensitive)))
+                (ppcre:scan scanner target-string)))))
+
 (defun insert-before (list item nth)
   "Insert ITEM before the NTH element of LIST."
   (declare (type (integer 0 *) nth))
