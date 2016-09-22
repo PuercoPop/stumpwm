@@ -25,7 +25,6 @@
   (:export #:cancel-timer
            #:run-with-timer
            ;; #:*toplevel-io*
-           #:stumpwm
            #:timer-p)
   (:documentation))
 
