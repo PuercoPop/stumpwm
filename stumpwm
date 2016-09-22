@@ -1,0 +1,1 @@
+#!/usr/bin/cl -Q -sp stumpwm -E stumpwm::cl-launch-entry-point

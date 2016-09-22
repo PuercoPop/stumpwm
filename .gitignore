@@ -13,7 +13,6 @@ config.log
 config.status
 autom4te.cache
 Makefile
-stumpwm
 stumpwm.info
 TAGS
 make-image.lisp

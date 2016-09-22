@@ -260,3 +260,8 @@ further up. "
               (run-hook *quit-hook*)
               ;; the number is the unix return code
               (return-from stumpwm 0))))))
+
+(defun cl-launch-entry-point (argv)
+  (if argv
+      (stumpwm (elt argv 0))
+      (stumpwm)))
