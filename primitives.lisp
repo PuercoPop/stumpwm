@@ -1201,25 +1201,6 @@ Like :tight but no border is ever visible.
 After changing this variable you may need to call
 sync-all-frame-windows to see the change.")
 
-(defvar *data-dir* nil
-  "The directory used by stumpwm to store data between sessions.")
-
-(defun data-dir-file (name &optional type)
-  "Return a pathname inside stumpwm's data dir with the specified name and type"
-  (ensure-directories-exist *data-dir*)
-  (make-pathname :name name :type type :defaults *data-dir*))
-
-(defmacro with-data-file ((s file &rest keys &key (if-exists :supersede) &allow-other-keys) &body body)
-  "Open a file in StumpWM's data directory. keyword arguments are sent
-directly to OPEN. Note that IF-EXISTS defaults to :supersede, instead
-of :error."
-  (declare (ignorable if-exists))
-  `(progn
-     (ensure-directories-exist *data-dir*)
-     (with-open-file (,s ,(merge-pathnames file *data-dir*)
-                         ,@keys)
-       ,@body)))
-
 (defmacro move-to-head (list elt)
    "Move the specified element in in LIST to the head of the list."
  `(progn
