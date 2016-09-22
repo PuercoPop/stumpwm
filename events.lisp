@@ -84,7 +84,7 @@
            (has-h () (= 8 (logand value-mask 8)))
            (has-stackmode () (= 64 (logand value-mask 64))))
     ;; Grant the configure request but then maximize the window after the granting.
-    (dformat 3 "CONFIGURE REQUEST ~@{~S ~}~%" stack-mode window x y width height border-width value-mask)
+    (v:trace :events "CONFIGURE REQUEST ~@{~S ~}" stack-mode window x y width height border-width value-mask)
     (let ((win (find-window window)))
       (cond
         (win
@@ -108,7 +108,7 @@
         (t (handle-unmanaged-window window x y width height border-width value-mask))))))
 
 (define-stump-event-handler :configure-notify (stack-mode #|parent|# window #|above-sibling|# x y width height border-width value-mask)
-  (dformat 4 "CONFIGURE NOTIFY ~@{~S ~}~%" stack-mode window x y width height border-width value-mask)
+  (v:debug :events "CONFIGURE NOTIFY ~@{~S ~}" stack-mode window x y width height border-width value-mask)
   (let ((screen (find-screen window)))
     (when screen
       (let ((old-heads (copy-list (screen-heads screen))))
@@ -117,27 +117,27 @@
           (setf (screen-heads screen) old-heads)
           (cond
             ((equalp old-heads new-heads)
-             (dformat 3 "Bogus configure-notify on root window of ~S~%" screen) t)
+             (v:warn :events "Bogus configure-notify on root window of ~S" screen) t)
             (t
-             (dformat 1 "Updating Xinerama configuration for ~S.~%" screen)
+             (v:trace :events "Updating Xinerama configuration for ~S" screen)
              (if new-heads
                  (head-force-refresh screen new-heads)
-                 (dformat 1 "Invalid configuration! ~S~%" new-heads)))))))))
+                 (v:warn :events "Invalid configuration! ~S" new-heads)))))))))
 
 (define-stump-event-handler :map-request (parent send-event-p window)
   (unless send-event-p
     ;; This assumes parent is a root window and it should be.
-    (dformat 3 "map request: ~a ~a ~a~%" window parent (find-window window))
+    (v:trace :events "Map request: ~A ~A ~A" window parent (find-window window))
     (let ((screen (find-screen parent))
           (win (find-window window))
           (wwin (find-withdrawn-window window)))
       ;; only absorb it if it's not already managed (it could be iconic)
       (cond
-        (win (dformat 1 "map request for mapped window ~a~%" win))
+        (win (v:trace :events "Map request for mapped window ~A" win))
         ((eq (xwin-type window) :dock)
          (when wwin
            (setf screen (window-screen wwin)))
-         (dformat 1 "window is dock-type. attempting to place in mode-line.")
+         (v:trace :events "Window is dock-type. Attempting to place in mode-line.")
          (place-mode-line-window screen window)
          ;; Some panels are broken and only set the dock type after they map and withdraw.
          (when wwin
@@ -160,7 +160,7 @@
   ;; ones where event-window and window are the same, and
   ;; substructure unmap events when the event-window is the parent
   ;; of window.
-  (dformat 2 "UNMAP: ~s ~s ~a~%" send-event-p (not (xlib:window-equal event-window window)) (find-window window))
+  (v:info :events "UNMAP-NOTIFY: ~S ~S ~A" send-event-p (not (xlib:window-equal event-window window)) (find-window window))
   (unless (and (not send-event-p)
                (not (xlib:window-equal event-window window)))
     (let ((window (find-window window)))
@@ -169,7 +169,7 @@
       (when window
         (if (plusp (window-unmap-ignores window))
             (progn
-              (dformat 3 "decrement ignores! ~d~%" (window-unmap-ignores window))
+              (v:info :events "Decrement ignores! ~D" (window-unmap-ignores window))
               (decf (window-unmap-ignores window)))
             (withdraw-window window))))))
 
@@ -206,7 +206,7 @@ The Caller is responsible for setting up the input focus."
 (defun handle-keymap (kmaps code state key-seq grab update-fn)
   "Find the command mapped to the (code state) and return it."
   ;; KMAPS is a list of keymaps that may match the user's key sequence.
-  (dformat 1 "Awaiting key ~a~%" kmaps)
+  (v:trace :events "Awaiting key ~A" kmaps)
   (let* ((key (code-state->key code state))
          (key-seq (cons key key-seq))
          (bindings (mapcar (lambda (m)
@@ -216,7 +216,7 @@ The Caller is responsible for setting up the input focus."
          ;; all the keymaps and recurse on them. If the first one is a
          ;; command, then we're done.
          (match (find-if-not 'null bindings)))
-    (dformat 1 "key-press: ~S ~S ~S~%" key state match)
+    (v:trace :events "Key-press: ~S ~S ~S" key state match)
     (run-hook-with-args *key-press-hook* key key-seq match)
     (when update-fn
       (funcall update-fn key-seq))
@@ -342,7 +342,7 @@ converted to an atom is removed."
     (:wm_normal_hints
      (setf (window-normal-hints window) (get-normalized-normal-hints (window-xwin window))
            (window-type window) (xwin-type (window-xwin window)))
-     (dformat 4 "new hints: ~s~%" (window-normal-hints window))
+     (v:trace :events "New hints: ~S" (window-normal-hints window))
      (window-sync window :normal-hints))
     (:wm_hints
      (maybe-set-urgency window))
@@ -368,7 +368,7 @@ converted to an atom is removed."
           (update-fullscreen window 1)))))))
 
 (define-stump-event-handler :property-notify (window atom state)
-  (dformat 2 "property notify ~s ~s ~s~%" window atom state)
+  (v:info :events "PROPERTY-NOTIFY ~S ~S ~S" window atom state)
   (case atom
     (:rp_command_request
      ;; we will only find the screen if window is a root window, which
@@ -449,14 +449,14 @@ converted to an atom is removed."
 ;;; Fullscreen functions
 
 (defun activate-fullscreen (window)
-  (dformat 2 "client requests to go fullscreen~%")
+  (v:trace :events "Client requests to go fullscreen")
   (add-wm-state (window-xwin window) :_NET_WM_STATE_FULLSCREEN)
   (setf (window-fullscreen window) t)
   (focus-window window))
 
 (defun deactivate-fullscreen (window)
   (setf (window-fullscreen window) nil)
-  (dformat 2 "client requests to leave fullscreen~%")
+  (v:trace :events "Client requests to leave fullscreen")
   (remove-wm-state (window-xwin window) :_NET_WM_STATE_FULLSCREEN)
   (update-decoration window)
   (update-mode-lines (current-screen)))
@@ -497,7 +497,7 @@ converted to an atom is removed."
       (focus-all window)))
 
 (define-stump-event-handler :client-message (window type #|format|# data)
-  (dformat 2 "client message: ~s ~s~%" type data)
+  (v:trace :events "CLIENT-MESSAGE: ~S ~S" type data)
   (case type
     (:_NET_CURRENT_DESKTOP              ;switch desktop
      (let* ((screen (find-screen window))
@@ -554,13 +554,13 @@ converted to an atom is removed."
      (when our-window
        (let ((x (elt data 1))
              (y (elt data 2)))
-         (dformat 3 "!!! Data: ~S~%" data)
+         (v:trace :events "Data: ~S" data)
          (group-move-request (window-group our-window) our-window x y :root)))))
   (t
-   (dformat 2 "ignored message~%"))))
+   (v:trace :events "Ignored message ~A" type))))
 
 (define-stump-event-handler :focus-out (window mode kind)
-  (dformat 5 "~@{~s ~}~%" window mode kind))
+  (v:trace :events "~@{~S ~}" window mode kind))
 
 (define-stump-event-handler :focus-in (window mode kind)
   (let ((win (find-window window)))
@@ -610,7 +610,7 @@ the window in it's frame."
 
 (defun handle-event (&rest event-slots &key display event-key &allow-other-keys)
   (declare (ignore display))
-  (dformat 1 ">>> ~S~%" event-key)
+  (v:trace :handle-event "HANDLE-EVENT >>> ~S" event-key)
   (let ((eventfn (gethash event-key *event-fn-table*))
         (win (getf event-slots :window))
         (*current-event-time* (getf event-slots :time)))
@@ -624,7 +624,7 @@ the window in it's frame."
       ;; structures gets out of sync with X or perhaps X assigns a
       ;; duplicate ID for a pixmap and a window.
       (when (and win (not (xlib:window-p win)))
-        (dformat 10 "Pixmap Workaround! ~s should be a window!~%" win)
+        (v:warn :events "Pixmap Workaround! ~S should be a window!" win)
         (setf (getf event-slots :window) (make-xlib-window win)))
       (handler-case
           (progn
@@ -644,6 +644,6 @@ the window in it's frame."
           ;; handled. If we catch it higher up the event will not be
           ;; flushed from the queue and we'll get ourselves into an
           ;; infinite loop.
-          (dformat 4 "ignore synchronous ~a~%" c))))
-    (dformat 2 "<<< ~S~%" event-key)
+          (v:error :events "Ignore synchronous ~A" c))))
+    (v:trace :events "Exiting HANDLE-EVENT <<< ~S" event-key)
     t))

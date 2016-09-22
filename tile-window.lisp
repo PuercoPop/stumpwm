@@ -99,7 +99,7 @@ than the root window's width and height."
                    (:none 0)
                    (t (default-border-width-for-type win))))
          center)
-    ;;    (dformat 4 "hints: ~s~%" hints)
+    (v:trace :tile-window "Hints: ~S" hints)
     ;; determine what the width and height should be
     (cond
       ;; handle specially fullscreen windows.
@@ -173,7 +173,7 @@ than the root window's width and height."
   "Maximize the window."
   (multiple-value-bind (x y wx wy width height border stick)
       (geometry-hints win)
-    (dformat 4 "maximize window ~a x: ~d y: ~d width: ~d height: ~d border: ~d stick: ~s~%" win x y width height border stick)
+    (v:trace :tile-window "MAXIMIZE-WINDOW ~A X: ~D Y: ~D Width: ~D Height: ~D Border: ~D Stick: ~S" win x y width height border stick)
     ;; This is the only place a window's geometry should change
     (set-window-geometry win :x wx :y wy :width width :height height :border-width 0)
     (xlib:with-state ((window-parent win))

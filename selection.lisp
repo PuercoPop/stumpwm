@@ -46,7 +46,7 @@
   (export-selection selection))
 
 (defun send-selection (requestor property selection target time)
-  (dformat 1 "send-selection ~s ~s ~s ~s ~s~%" requestor property selection target time)
+  (v:trace :selection "SEND-SELECTION ~S ~S ~S ~S ~S" requestor property selection target time)
   (case target
     ;; they're requesting what targets are available
     (:targets

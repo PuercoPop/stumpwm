@@ -137,7 +137,7 @@ function expects to be wrapped in a with-state for win."
 (defun show-frame-outline (group &optional (clear t))
   ;; Don't draw if this isn't a current group!
   (when (find group (mapcar 'screen-current-group *screen-list*))
-    (dformat 5 "show-frame-outline!~%")
+    (v:trace :message-window "Entering SHOW-FRAME-OUTLINE")
     ;; *resize-hides-windows* uses the frame outlines for display,
     ;; so try not to interfere.
     (unless (eq *top-map* *resize-map*)
@@ -205,7 +205,7 @@ function expects to be wrapped in a with-state for win."
 (defun redraw-current-message (screen)
   (let ((*record-last-msg-override* t)
         (*ignore-echo-timeout* t))
-    (dformat 5 "Redrawing message window!~%")
+    (v:trace :message-window "Redrawing message window")
     (apply 'echo-string-list screen (screen-current-msg screen) (screen-current-msg-highlights screen))))
 
 (defun echo-nth-last-message (screen n)
@@ -234,7 +234,6 @@ function expects to be wrapped in a with-state for win."
           (reset-message-window-timer)))
     (push-last-message screen strings highlights)
     (xlib:display-finish-output *display*)
-    (dformat 5 "Outputting a message:~%~{        ~a~%~}" strings)
     (apply 'run-hook-with-args *message-hook* strings)))
 
 (defun echo-string (screen msg)

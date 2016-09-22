@@ -63,13 +63,14 @@ further up. "
     ;; ignore asynchronous window errors
     ((and asynchronous
           (find error-key '(xlib:window-error xlib:drawable-error xlib:match-error)))
-     (dformat 4 "Ignoring error: ~s~%" error-key))
+     (v:error :stumpwm "Ignoring error: ~S" error-key))
     ((eq error-key 'xlib:access-error)
      (write-line "Another window manager is running.")
      (throw :top-level :quit))
      ;; all other asynchronous errors are printed.
      (asynchronous
-      (message "Caught Asynchronous X Error: ~s ~s" error-key key-vals))
+      (message "Caught Asynchronous X Error: ~s ~s" error-key key-vals)
+      (v:error :stumpwm "Ignoring error: ~S" error-key))
      (t
       (apply 'error error-key :display display :error-key error-key key-vals))))
 
@@ -203,8 +204,10 @@ further up. "
                  (multiple-value-bind (success err rc) (load-rc-file)
                    (if success
                        (and *startup-message* (message *startup-message* (print-key *escape-key*)))
-                       (message "^B^1*Error loading ^b~A^B: ^n~A" rc err))))
+                       (v:fatal :stumpwm "Error loading~A: ~A" rc err))))
                (when *last-unhandled-error*
+                 (v:fatal :stumpwm "StumpWM Crashed With An Unhandled Error!")
+                 (v:fatal :stumwpm *last-unhandled-error*)
                  (message-no-timeout "^B^1*StumpWM Crashed With An Unhandled Error!~%Copy the error to the clipboard with the 'copy-unhandled-error' command.~%^b~a^B^n~%~%~a"
                           (first *last-unhandled-error*) (second *last-unhandled-error*)))
                (mapc 'process-existing-windows *screen-list*)
@@ -216,7 +219,7 @@ further up. "
                  (mapc 'unhide-window (reverse (group-windows (screen-current-group s))))
                  ;; update groups
                  (dolist (g (reverse (screen-groups s)))
-                   (dformat 3 "Group windows: ~S~%" (group-windows g))
+                   (v:trace :stumpwm "Group windows: ~S" (group-windows g))
                    (group-startup g))
                  ;; switch to the (old) current group.
                  (let ((netwm-id (first (xlib:get-property (screen-root s) :_NET_CURRENT_DESKTOP))))
@@ -237,6 +240,7 @@ further up. "
   (setf *data-dir*
         (make-pathname :directory (append (pathname-directory (user-homedir-pathname))
                                           (list ".stumpwm.d"))))
+  (start-log)
   (init-load-path *module-dir*)
   (loop
      (let ((ret (catch :top-level

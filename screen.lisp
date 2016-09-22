@@ -192,7 +192,7 @@ identity with a range check."
   (window-by-id (xlib:window-id xwin)))
 
 (defun find-window-by-parent (xwin &optional (windows (all-windows)))
-  (dformat 3 "find-window-by-parent!~%")
+  (v:trace :screen "FIND-WINDOW-BY-PARENT called with ~A" xwin)
   (find xwin windows :key 'window-parent :test 'xlib:window-equal))
 
 (defun screen-root (screen)
@@ -385,7 +385,7 @@ FOCUS-WINDOW is an extra window used for _NET_SUPPORTING_WM_CHECK."
 (defun init-screen (screen-number id host)
   "Given a screen number, returns a screen structure with initialized members"
   ;; Listen for the window manager events on the root window
-  (dformat 1 "Initializing screen: ~a ~a~%" host id)
+  (v:trace :screen "Initializing screen: ~A ~A" host id)
   (setf (xlib:window-event-mask (xlib:screen-root screen-number))
         '(:substructure-redirect
           :substructure-notify

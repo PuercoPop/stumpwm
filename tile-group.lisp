@@ -81,7 +81,7 @@
 
 (defmethod group-move-request ((group tile-group) window x y relative-to)
   (when *honor-window-moves*
-    (dformat 3 "Window requested new position ~D,~D relative to ~S~%" x y relative-to)
+    (v:trace :tile-group "Window requested new position ~D,~D relative to ~S" x y relative-to)
     (let* ((pos  (if (eq relative-to :parent)
                      (list
                       (+ (xlib:drawable-x (window-parent window)) x)
@@ -628,7 +628,7 @@ LEAF. Return tree with leaf removed."
                                (frame-y f) (+ (round (* (- (frame-y f) ty) hf)) y)
                                (frame-width f) (round (* (frame-width f) wf))
                                (frame-x f) (+ (round (* (- (frame-x f) tx) wf)) x))))
-    (dformat 4 "resize-tree ~Dx~D -> ~Dx~D~%" tw th (tree-width tree) (tree-height tree))))
+    (v:debug :tile-group "Resize-tree ~Dx~D -> ~Dx~D" tw th (tree-width tree) (tree-height tree))))
 
 (defun remove-frame (tree leaf)
   "Return a new tree with LEAF and it's sibling merged into
@@ -644,7 +644,7 @@ one."
   "synchronize windows attached to FRAME."
   (mapc (lambda (w)
           (when (eq (window-frame w) frame)
-            (dformat 3 "maximizing ~S~%" w)
+            (v:trace :tile-group "Maximizing ~S" w)
             (maximize-window w)))
         (group-windows group)))
 
@@ -678,7 +678,7 @@ either :width or :height"
              (let ((right-sibling (cadr (member node parent)))
                    (left-sibling (cadr (member node (reverse parent)))))
 
-               (dformat 10 "max ~@{~a~^ ~}~%" parent node min dim-fn right-sibling left-sibling)
+               (v:debug :tile-group "Max ~@{~A~^ ~}" parent node min dim-fn right-sibling left-sibling)
                (if parent
                    (cond (right-sibling
                           (max 0 (- (funcall dim-fn right-sibling) min)))
@@ -691,7 +691,7 @@ either :width or :height"
            (parent (tree-parent tree frame))
            (gparent (tree-parent tree parent))
            (split-type (tree-split-type parent)))
-      (dformat 10 "~s ~s parent: ~s ~s width: ~s h: ~s~%" dim amount split-type parent (tree-width parent) (tree-height parent))
+      (v:debug :tile-group "~S ~S Parent: ~S ~S Width: ~S Height: ~S" dim amount split-type parent (tree-width parent) (tree-height parent))
       ;; normalize amount
       (let* ((max (ecase dim
                     (:width
@@ -722,7 +722,7 @@ either :width or :height"
                          0
                          (- *min-frame-height* (frame-height frame)))))))
         (setf amount (max (min amount max) min))
-        (dformat 10 "bounds ~d ~d ~d~%" amount max min))
+        (v:debug :tile-group "Bounds ~D ~D ~D" amount max min))
       ;; if FRAME is taking up the whole DIM or if AMOUNT = 0, do nothing
       (unless (zerop amount)
         (let* ((resize-parent (or (and (eq split-type :column)
@@ -869,7 +869,7 @@ windows used to draw the numbers in. The caller must destroy them."
                                 (screen-bg-color screen)
                                 (string (get-frame-number-translation f)))
                 (xlib:display-finish-output *display*)
-                (dformat 3 "mapped ~S~%" (frame-number f))
+                (v:trace :tile-group "Mapped ~S" (frame-number f))
                 w))
             (group-frames group))))
 
@@ -1026,7 +1026,7 @@ select one. Returns the selected frame or nil if aborted."
                  (draw-frame-numbers group)))
          (ch (read-one-char (group-screen group)))
          (num (read-from-string (string ch) nil nil)))
-    (dformat 3 "read ~S ~S~%" ch num)
+    (v:trace :tile-group "Read ~S ~S" ch num)
     (mapc #'xlib:destroy-window wins)
     (clear-frame-outlines group)
     (find ch (group-frames group)

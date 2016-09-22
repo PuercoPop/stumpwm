@@ -540,7 +540,7 @@ critical."
           (resize-mode-line (head-mode-line head))
           (xlib:map-window (mode-line-window (head-mode-line head)))
           (redraw-mode-line (head-mode-line head))
-          (dformat 3 "modeline: ~s~%" (head-mode-line head))
+          (v:trace :modeline "Modeline: ~S" (head-mode-line head))
           ;; setup the timer
           (turn-on-mode-line-timer)
           (run-hook-with-args *new-mode-line-hook* (head-mode-line head))))

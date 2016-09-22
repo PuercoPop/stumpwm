@@ -728,7 +728,7 @@ positive direction."
                         for i in nums
                         when (/= n i)
                         do (return n))))
-    (dformat 3 "Free number: ~S~%" nums)
+    (v:trace :primitives "FIND-FREE-NUMBER: ~S" nums)
     (if new-num
         new-num
         ;; there was no space between the numbers, so use the max+inc

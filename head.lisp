@@ -113,14 +113,14 @@
   (< (frame-number frame) (length (group-heads group))))
 
 (defun add-head (screen head)
-  (dformat 1 "Adding head #~D~%" (head-number head))
+  (v:trace :head "ADD-HEAD #~D" (head-number head))
   (setf (screen-heads screen) (sort (push head (screen-heads screen)) #'<
                                     :key 'head-number))
   (dolist (group (screen-groups screen))
     (group-add-head group head)))
 
 (defun remove-head (screen head)
-  (dformat 1 "Removing head #~D~%" (head-number head))
+  (v:trace :head "REMOVING-HEAD #~D" (head-number head))
   (when (head-mode-line head)
     (toggle-mode-line screen head))
   (dolist (group (screen-groups screen))

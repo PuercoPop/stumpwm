@@ -32,7 +32,8 @@
 
 (in-package #:stumpwm-configuration)
 
-(defvar *data-dir* nil
+(defvar *data-dir* (make-pathname :directory (append (pathname-directory (user-homedir-pathname))
+                                                     (list ".stumpwm.d")))
   "The directory used by stumpwm to store data between sessions.")
 
 (defun data-dir-file (name &optional type)

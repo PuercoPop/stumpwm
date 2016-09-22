@@ -11,11 +11,14 @@
   :depends-on (#:alexandria
                #:cl-ppcre
                #:clx
+               #:piping
                (:feature :sbcl #:sb-posix)
-               #:split-sequence)
+               #:split-sequence
+               #:verbose)
   :components ((:file "timer")
                (:file "configuration")
-               (:file "package" :depends-on ("timer" "configuration"))
+               (:file "logging" :depends-on ("configuration"))
+               (:file "package" :depends-on ("timer" "logging" "configuration"))
                (:file "primitives")
                (:file "workarounds")
                (:file "wrappers")

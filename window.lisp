@@ -387,7 +387,7 @@ _NET_WM_STATE_DEMANDS_ATTENTION set"
 (defun xwin-role (win)
   "Return WM_WINDOW_ROLE"
   (let ((name (xlib:get-property win :WM_WINDOW_ROLE)))
-    (dformat 10 "role: ~a~%" name)
+    (v:info :window "Role: ~A" name)
     (if name
         (utf8-to-string name)
         "")))
@@ -497,7 +497,7 @@ _NET_WM_STATE_DEMANDS_ATTENTION set"
     (xlib:unmap-subwindows (window-parent window))))
 
 (defun hide-window (window)
-  (dformat 2 "hide window: ~s~%" window)
+  (v:trace :window "HIDE-WINDOW: ~S" window)
   (unless (eql (window-state window) +iconic-state+)
     (setf (window-state window) +iconic-state+)
     ;; Mark window as hidden
@@ -656,7 +656,7 @@ and bottom_end_x."
         (*processing-existing-windows* t)
         (stacking (xlib:get-property (screen-root screen) :_NET_CLIENT_LIST_STACKING :type :window)))
     (when stacking
-      (dformat 3 "Using window stacking: ~{~X ~}~%" stacking)
+      (v:trace :window "Using window stacking: ~{~X ~}" stacking)
       ;; sort by _NET_CLIENT_LIST_STACKING
       (setf children (stable-sort children #'< :key
                                   (lambda (xwin)
@@ -669,12 +669,12 @@ and bottom_end_x."
                     (internal-window-p screen win))
           (if (eq (xwin-type win) :dock)
               (progn
-                (dformat 1 "Window ~S is dock-type. Placing in mode-line.~%" win)
+                (v:trace :window "Window ~S is dock-type. Placing in mode-line." win)
                 (place-mode-line-window screen win))
               (if (or (eql map-state :viewable)
                       (eql wm-state +iconic-state+))
                   (progn
-                    (dformat 1 "Processing ~S ~S~%" (xwin-name win) win)
+                    (v:trace :window "Processing ~S ~S" (xwin-name win) win)
                     (xlib:with-server-grabbed (*display*)
                       (process-mapped-window screen win)))))))))
   (dolist (w (screen-windows screen))
@@ -832,7 +832,7 @@ needed."
   ;; This function cannot request info about WINDOW from the xserver as it may not exist anymore.
   (let ((group (window-group window))
         (screen (window-screen window)))
-    (dformat 1 "withdraw window ~a~%" screen)
+    (v:trace :window "WITHDRAW-WINDOW: ~A" screen)
     ;; Save it for later since it is only withdrawn, not destroyed.
     (push window (screen-withdrawn-windows screen))
     (setf (window-state window) +withdrawn-state+
@@ -864,9 +864,9 @@ needed."
           (delete window (screen-withdrawn-windows screen)))
     (setf (screen-urgent-windows screen)
           (delete window (screen-urgent-windows screen)))
-    (dformat 1 "destroy window ~a~%" screen)
-    (dformat 3 "destroying parent window~%")
-    (dformat 7 "parent window is ~a~%" (window-parent window))
+    (v:trace :window "destroy window ~a" screen)
+    (v:trace :window "destroying parent window")
+    (v:trace :window "parent window is ~a" (window-parent window))
     (xlib:destroy-window (window-parent window))))
 
 (defun move-window-to-head (group window)
@@ -879,7 +879,7 @@ needed."
 
 (defun no-focus (group last-win)
   "don't focus any window but still read keyboard events."
-  (dformat 3 "no-focus~%")
+  (v:trace :window "NO-FOCUS")
   (let* ((screen (group-screen group)))
     (when (eq group (screen-current-group screen))
       (xlib:set-input-focus *display* (screen-focus-window screen) :POINTER-ROOT)
@@ -890,7 +890,7 @@ needed."
 
 (defmethod focus-window (window &optional (raise t))
   "Make the window visible and give it keyboard focus. If raise is t, raise the window."
-  (dformat 3 "focus-window: ~s~%" window)
+  (v:trace :window "FOCUS-WINDOW: ~S" window)
   (let* ((group (window-group window))
          (screen (group-screen group))
          (cw (screen-focus screen))
@@ -925,7 +925,7 @@ needed."
 
 (defun xwin-kill (window)
   "Kill the client associated with window."
-  (dformat 3 "Kill client~%")
+  (v:info :window "Kill client")
   (xlib:kill-client *display* (xlib:window-id window)))
 
 (defun default-window-menu-filter (item-string item-object user-input)

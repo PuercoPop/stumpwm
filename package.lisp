@@ -20,6 +20,7 @@
 (defpackage #:stumpwm
   (:use #:cl
         #:stumpwm-configuration
+        #:stumpwm-logging
         #:stumpwm-timer)
   (:import-from #:alexandria
                 #:if-let
