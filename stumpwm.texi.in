@@ -1615,8 +1615,6 @@ Select the highlighted option.
 @end table
 
 !!! iresize
-!!! abort-iresize
-!!! exit-iresize
 
 ### *resize-increment*
 
