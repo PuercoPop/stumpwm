@@ -14,6 +14,7 @@ jobs:
           sbcl --disable-debugger --load quicklisp.lisp --eval "(quicklisp-quickstart:install)" --eval "(ql-util:without-prompting (ql:add-to-init-file))" --eval "(sb-ext:exit)"
       - name: configure ASDF
         run: |
+          mkdir -p ~/.config/common-lisp/source-registry.conf.d/
           echo "(:directory (:home \"${GITHUB_WORKSPACE}\"))" > ~/.config/common-lisp/source-registry.conf.d/10-cl-stumpwm.conf
       - name: build-stumpwm
         run: |
