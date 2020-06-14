@@ -17,4 +17,4 @@ jobs:
           cd ${GITHUB_WORKSPACE}
           ./autogen.sh
           ./configure
-          make
+          make stumpwm
